@@ -465,7 +465,7 @@ function draw() {
   }
   ////////////////////draw groups of players
   
-  if (my.members){  //////////////////data validation
+  
   if (my.members.length){
       for (let member of my.members){
             fill(234, 33, 124);
@@ -496,8 +496,6 @@ function draw() {
         fill(234, 33, 124);
         ellipse(my.body.x, my.body.y, 20);
       }
-  
-}
 
   ////////////////////
   
