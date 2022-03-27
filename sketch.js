@@ -30,9 +30,9 @@ class ColliGroup{
   getPosition(index){
     let arr = Array.from(this.members.keys())
     
-    let offset = (arr.indexOf(index)+1) * 20 - arr.length * 20;
-    let x = this.body.x + offset;
-    let y = this.body.y;
+    let offset = (arr.indexOf(index)+1) * 25 - arr.length * 25;
+    let x = this.body.x;
+    let y = this.body.y  + offset ;
 
     return [x , y]
   }
@@ -461,16 +461,22 @@ function draw() {
   }
   ////////////////////draw groups of players
   
-     
+  if (my.members){  //////////////////data validation
   if (my.members.length){
       for (let member of my.members){
             fill(234, 33, 124);
    
         if (participants[member]){//////////////////data validation
           // draw the mouse
-          let dir = my.dir !== 'none' ? my.dir : (my.facing == 'left' ? 'left' : 'right');
-          let ifRunning = my.dir !== 'none' ? true : false;
-          drawMouse(participants[member].body.x, participants[member].body.y, dir, ifRunning, my.pizzaPicked);
+//           let dir = my.dir !== 'none' ? my.dir : (my.facing == 'left' ? 'left' : 'right');
+//           let ifRunning = my.dir !== 'none' ? true : false;
+//           drawMouse(participants[member].body.x, participants[member].body.y, dir, ifRunning, my.pizzaPicked);
+//           ellipse(participants[member].body.x, participants[member].body.y, 20);
+          
+          // draw the mouse -- jessie
+          let dir = participants[member].dir !== 'none' ? participants[member].dir : (participants[member].facing == 'left' ? 'left' : 'right');
+          let ifRunning = participants[member].dir !== 'none' ? true : false;
+          drawMouse(participants[member].body.x, participants[member].body.y, dir, ifRunning, participants[member].pizzaPicked);
           ellipse(participants[member].body.x, participants[member].body.y, 20);
           
           
@@ -479,11 +485,15 @@ function draw() {
       }
         
       }else{
+        //draw the mouse -- jessie
+        let dir = my.dir !== 'none' ? my.dir : (my.facing == 'left' ? 'left' : 'right');
+          let ifRunning = my.dir !== 'none' ? true : false;
+          drawMouse(my.body.x, my.body.y, dir, ifRunning, my.pizzaPicked);
         fill(234, 33, 124);
         ellipse(my.body.x, my.body.y, 20);
       }
   
-
+}
 
   ////////////////////
   
