@@ -130,12 +130,13 @@ let obst;
 const ASSETSManager = new Map();
 
 function preload() {
-  partyConnect("wss://deepstream-server-1.herokuapp.com", "arteam3", "newroom00");
+  partyConnect("wss://deepstream-server-1.herokuapp.com", "arteam3", "newroom");
   shared = partyLoadShared("shared");
   my = partyLoadMyShared();
   participants = partyLoadParticipantShareds();
   
   // load assets
+  ASSETSManager.set("timer_font", loadFont("pixelmix.ttf"));
   // single mouse animation
   ASSETSManager.set("mouse_stand", loadAnimation("assets/Mouse_stand_", 6));
   ASSETSManager.set("mouse_run", loadAnimation("assets/Mouse_run_", 6));
@@ -210,6 +211,7 @@ function drawMask(x, y) {
   push();
   imageMode(CENTER);
   image(ASSETSManager.get("mask"), x, y - 15);
+  
   pop();
 }
 
@@ -219,6 +221,8 @@ function setup() {
   createCanvas(800, 600);
   rectMode(CENTER);
   frameRate(30);
+  textFont(ASSETSManager.get("timer_font"));
+  textAlign(CENTER);
   noStroke();
   
   my.id = random(1);
@@ -458,7 +462,8 @@ function draw() {
   })
   
   if (my.ready){//////////////////data validation
-    if(dist(my.body.x, my.body.y, my.pizza.x, my.pizza.y) < 30){
+    // if(dist(my.body.x, my.body.y, my.pizza.x, my.pizza.y) < 30){
+    if( my.pizzaPicked === true && dist(my.body.x, my.body.y, my.target.x, my.target.y) < 30){
       my.pizza.x = my.body.x;
       my.pizza.y = my.body.y + 10;
       
@@ -501,9 +506,9 @@ function draw() {
   drawMask(my.body.x, my.body.y);
   ////////////////////draw pizza and hole
   push();
-  fill(0);
-  textSize(20);
-  text(shared.timer, width/2, 20);
+  fill(255);
+  textSize(32);
+  text(shared.timer, width/2, 72);
   
   fill(32, 54, 123);
   image(ASSETSManager.get("hole_EX"), my.target.x, my.target.y);
