@@ -130,7 +130,7 @@ let obst;
 const ASSETSManager = new Map();
 
 function preload() {
-  partyConnect("wss://deepstream-server-1.herokuapp.com", "arteam3", "newroom");
+  partyConnect("wss://deepstream-server-1.herokuapp.com", "arteam3", "newroom0");
   shared = partyLoadShared("shared");
   my = partyLoadMyShared();
   participants = partyLoadParticipantShareds();
@@ -142,11 +142,24 @@ function preload() {
   // multi mice animation
   ASSETSManager.set("mouse_multi_stand", loadAnimation("assets/Mouse_stand_multi_", 6));
   ASSETSManager.set("mouse_multi_run", loadAnimation("assets/Mouse_run_multi_", 6));
+  ASSETSManager.set("mouse_multi_forward_stand", loadAnimation("assets/Mouse_stand_multi_forward_", 6));
+  ASSETSManager.set("mouse_multi_forward_run", loadAnimation("assets/Mouse_run_multi_forward_", 6));
+  ASSETSManager.set("mouse_multi_back_stand", loadAnimation("assets/Mouse_stand_multi_back_", 6));
+  ASSETSManager.set("mouse_multi_back_run", loadAnimation("assets/Mouse_run_multi_back_", 6));
   // pizza animation
   ASSETSManager.set("pizza_forward_stand", loadAnimation("assets/Pizza_stand_forward_", 6));
   ASSETSManager.set("pizza_forward_run", loadAnimation("assets/Pizza_run_forward_", 6));
   ASSETSManager.set("pizza_back_stand", loadAnimation("assets/Pizza_stand_back_", 6));
   ASSETSManager.set("pizza_back_run", loadAnimation("assets/Pizza_run_back_", 6));
+  // objects
+  ASSETSManager.set("pizza_on_ground", loadImage("assets/Pizza_on_ground.png"));
+  ASSETSManager.set("objects", loadAnimation("assets/Obstacle_", 9));
+  ASSETSManager.set("hole", loadImage("assets/Targethole.png"));
+  ASSETSManager.set("hole_EX", loadImage("assets/Targethole_EX.png"));
+  ASSETSManager.set("target_arrow", loadAnimation("assets/Target_arrow_", 4));
+  // background
+  ASSETSManager.set("background", loadImage("assets/Background.png"));
+  ASSETSManager.set("mask", loadImage("assets/Mask.png"));
 }
 
 function loadAnimation(filename, num) {
@@ -164,12 +177,10 @@ function drawMouse(x, y, dir, ifRunning, hasPizza, miceNum = 1) {
   imageMode(CORNER);
   let img, movingState = ifRunning ? 'run' : 'stand', animSpeed = ifRunning ? 24 : 45;
   // select the image
-  if(miceNum < 3) {
-    if(miceNum == 1) {
-      img = ASSETSManager.get("mouse_" + movingState)[floor(frameCount % animSpeed / (animSpeed / 6))];
-    } else {
-      img = ASSETSManager.get("mouse_multi_" + movingState)[floor(frameCount % animSpeed / (animSpeed / 6))];
-    }
+  if(miceNum <= 1) {
+    img = ASSETSManager.get("mouse_" + movingState)[floor(frameCount % animSpeed / (animSpeed / 6))];
+  } else {
+    img = ASSETSManager.get("mouse_multi_" + movingState)[floor(frameCount % animSpeed / (animSpeed / 6))];
   }
   // calculate the position
   let posX = x - 56, posY = y - img.height + 30;
@@ -178,7 +189,13 @@ function drawMouse(x, y, dir, ifRunning, hasPizza, miceNum = 1) {
     scale(-1, 1);
     posX = -56 - x;
   }
-  image(img, posX, posY);
+  image(img, posX, posY); // draw the mouse image
+  if(miceNum >= 3) { // draw additional mice
+    for(let m = 0; m <= miceNum - 3; m++) {
+      if(m % 2 === 0) image(ASSETSManager.get("mouse_multi_forward_" + movingState)[floor(frameCount % animSpeed / (animSpeed / 6))], posX, posY - (ifRunning ? 40 : 32));
+      else image(ASSETSManager.get("mouse_multi_back_" + movingState)[floor(frameCount % animSpeed / (animSpeed / 6))], posX, posY - (ifRunning ? 40 : 32));
+    }
+  }
   
   // check if has pizza
   if(hasPizza) {
@@ -188,9 +205,18 @@ function drawMouse(x, y, dir, ifRunning, hasPizza, miceNum = 1) {
   }
   pop();
 }
+// draw the black mask
+function drawMask(x, y) {
+  push();
+  imageMode(CENTER);
+  image(ASSETSManager.get("mask"), x, y - 15);
+  pop();
+}
 
 function setup() {
-  createCanvas(600, 600);
+  partyToggleInfo(false);
+
+  createCanvas(800, 600);
   rectMode(CENTER);
   frameRate(30);
   noStroke();
@@ -212,8 +238,11 @@ function setup() {
     partySetShared(shared, {obsts: [], score: 0, timer: 90})
     // shared.obsts = [];
     // shared.score = 0;
-    for(let i = 0; i < 40; i++){
-      shared.obsts.push({x: int(random(-20, width+20)), y: int(random(-20, height+20))});
+    for(let i = 0; i < 20; i++){
+      shared.obsts.push({
+        x: int(random(-20, width + 20)),
+        y: int(height / 20 * i),
+        type: floor(random(ASSETSManager.get("objects").length))});
     }
     
     //initialize colli groups
@@ -225,8 +254,8 @@ function setup() {
 
 function draw() {
 
-
-  background(220);
+  imageMode(CORNER);
+  image(ASSETSManager.get("background"), 0, 0);
   
   if(partyIsHost()){
     if(frameCount % 60 === 0){
@@ -261,16 +290,12 @@ function draw() {
     my.dX = 0;
     //my.dir = 'none';
   }
-  
-  /////////////front end 
- if (!keyIsDown(39) && !keyIsDown(37) && !keyIsDown(38) && !keyIsDown(40)){
-    handleParentEvent();
- }
 
-  /////////////////////////////////////
-  //will update positions later
-  // my.body.x += my.dX;
-  // my.body.y += my.dY;
+  ///////////front end 
+  
+  if (!keyIsDown(39) && !keyIsDown(37) && !keyIsDown(38) && !keyIsDown(40)){
+    handleParentEvent();
+  }
   
 
   if(partyIsHost() ){
@@ -449,12 +474,12 @@ function draw() {
   })
   
   if (my.ready){//////////////////data validation
-    if(dist(my.body.x, my.body.y, my.pizza.x, my.pizza.y) < 20){
+    if(dist(my.body.x, my.body.y, my.pizza.x, my.pizza.y) < 30){
       my.pizza.x = my.body.x;
       my.pizza.y = my.body.y + 10;
       my.pizzaPicked = true;
     }
-    if(dist(my.pizza.x, my.pizza.y, my.target.x, my.target.y) < 20){
+    if(dist(my.pizza.x, my.pizza.y, my.target.x, my.target.y) < 30){
       shared.score += 1;
       my.pizza.x = random(width);
       my.pizza.y = random(height);
@@ -463,25 +488,50 @@ function draw() {
       //my.target.y = random(height);
     }
   }
-  ////////////////////draw groups of players
   
+  
+  ////////////////////draw obstacles
+  
+  shared.obsts.forEach((obst) => {
+    fill(24, 233, 14);
+    imageMode(CENTER);
+    image(ASSETSManager.get("objects")[obst.type], obst.x, obst.y);
+    // ellipse(obst.x, obst.y, 40);
+  });
+  
+  drawMask(my.body.x, my.body.y);
+  ////////////////////draw pizza and hole
+  push();
+  fill(0);
+  textSize(20);
+  text(shared.timer, width/2, 20);
+  
+  fill(32, 54, 123);
+  image(ASSETSManager.get("hole_EX"), my.target.x, my.target.y);
+  // rect(my.target.x, my.target.y, 20, 20);
+  
+  fill(120, 135, 163);
+  if(!my.pizzaPicked) {
+    image(ASSETSManager.get("pizza_on_ground"), my.pizza.x, my.pizza.y);
+    image(ASSETSManager.get("target_arrow")[floor(frameCount % 40 / 10)], my.pizza.x, my.pizza.y - 40);
+  } else {
+    image(ASSETSManager.get("target_arrow")[floor(frameCount % 40 / 10)], my.target.x, my.target.y - 40);
+  }
+  // rect(my.pizza.x, my.pizza.y, 20, 20);
+  pop();
+  
+  ////////////////////draw groups of players
   
   if (my.members.length){
       for (let member of my.members){
             fill(234, 33, 124);
    
         if (participants[member]){//////////////////data validation
-          // draw the mouse
-//           let dir = my.dir !== 'none' ? my.dir : (my.facing == 'left' ? 'left' : 'right');
-//           let ifRunning = my.dir !== 'none' ? true : false;
-//           drawMouse(participants[member].body.x, participants[member].body.y, dir, ifRunning, my.pizzaPicked);
-//           ellipse(participants[member].body.x, participants[member].body.y, 20);
-          
           // draw the mouse -- jessie
           let dir = participants[member].dir !== 'none' ? participants[member].dir : (participants[member].facing == 'left' ? 'left' : 'right');
           let ifRunning = participants[member].dir !== 'none' ? true : false;
-          drawMouse(participants[member].body.x, participants[member].body.y, dir, ifRunning, participants[member].pizzaPicked);
-          ellipse(participants[member].body.x, participants[member].body.y, 20);
+          drawMouse(participants[member].body.x, participants[member].body.y, dir, ifRunning, participants[member].pizzaPicked, my.members,length);
+          // ellipse(participants[member].body.x, participants[member].body.y, 20);
           
           
         }
@@ -491,36 +541,14 @@ function draw() {
       }else{
         //draw the mouse -- jessie
         let dir = my.dir !== 'none' ? my.dir : (my.facing == 'left' ? 'left' : 'right');
-          let ifRunning = my.dir !== 'none' ? true : false;
-          drawMouse(my.body.x, my.body.y, dir, ifRunning, my.pizzaPicked);
+        let ifRunning = my.dir !== 'none' ? true : false;
+        drawMouse(my.body.x, my.body.y, dir, ifRunning, my.pizzaPicked,  my.members,length);
         fill(234, 33, 124);
-        ellipse(my.body.x, my.body.y, 20);
+        // ellipse(my.body.x, my.body.y, 20);
       }
-
-  ////////////////////
-  
-  shared.obsts.forEach((obst) => {
-    fill(24, 233, 14);
-    ellipse(obst.x, obst.y, 40);
-  });
-  
-  //console.log(my.facing);
-  
-  push();
-  fill(0);
-  textSize(20);
-  text(shared.timer, width/2, 20);
-  
-  fill(32, 54, 123);
-  rect(my.target.x, my.target.y, 20, 20);
-  
-  fill(120, 135, 163);
-  rect(my.pizza.x, my.pizza.y, 20, 20);
-  push();
   
   my.dir = 'none';
 }
-
 
 ///////////front end 
 let parentKeyCode = 0; 
@@ -555,7 +583,5 @@ function handleParentEvent(){
     my.dX = 0;
     //my.dir = 'none';
   }
-  
-  
 
 }
