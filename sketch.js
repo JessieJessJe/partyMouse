@@ -388,23 +388,7 @@ function draw() {
       }
       
     }) 
-    //approach 2 --
-//     colliGroups.groups.forEach((group)=>{
-//       //update locations
-//       group.members.forEach((memberIdx)=>{
-//         group.updatePosition(participants[memberIdx])
-//       })
-//       //broadcast to all members
-//       group.members.forEach((memberIdx)=>{
-//         let [x, y] = group.getPosition(memberIdx)  
-       
-//         participants[memberIdx].body = {x:x , y:y }
-//         participants[memberIdx].members = Array.from(group.members.keys())
-//       })
-      
-    // })
-    //STEP 2:ends
-    
+
   }//end of partyIsHost()
   
   //update locations if no group assigned
@@ -523,20 +507,26 @@ function draw() {
   ////////////////////draw groups of players
   
   if (my.members.length){
-      for (let member of my.members){
-            fill(234, 33, 124);
+
+    let member = my.members[0];
+
+    let dir = participants[member].dir !== 'none' ? participants[member].dir : (participants[member].facing == 'left' ? 'left' : 'right');
+    let ifRunning = participants[member].dir !== 'none' ? true : false;
+    drawMouse(participants[member].body.x, participants[member].body.y, dir, ifRunning, participants[member].pizzaPicked, my.members,length);
+      // for (let member of my.members){
+      //       fill(234, 33, 124);
    
-        if (participants[member]){//////////////////data validation
-          // draw the mouse -- jessie
-          let dir = participants[member].dir !== 'none' ? participants[member].dir : (participants[member].facing == 'left' ? 'left' : 'right');
-          let ifRunning = participants[member].dir !== 'none' ? true : false;
-          drawMouse(participants[member].body.x, participants[member].body.y, dir, ifRunning, participants[member].pizzaPicked, my.members,length);
-          // ellipse(participants[member].body.x, participants[member].body.y, 20);
+      //   if (participants[member]){//////////////////data validation
+      //     // draw the mouse -- jessie
+      //     let dir = participants[member].dir !== 'none' ? participants[member].dir : (participants[member].facing == 'left' ? 'left' : 'right');
+      //     let ifRunning = participants[member].dir !== 'none' ? true : false;
+      //     drawMouse(participants[member].body.x, participants[member].body.y, dir, ifRunning, participants[member].pizzaPicked, my.members,length);
+      //     // ellipse(participants[member].body.x, participants[member].body.y, 20);
           
           
-        }
+      //   }
            
-      }
+      // }
         
       }else{
         //draw the mouse -- jessie
@@ -544,7 +534,7 @@ function draw() {
         let ifRunning = my.dir !== 'none' ? true : false;
         drawMouse(my.body.x, my.body.y, dir, ifRunning, my.pizzaPicked,  my.members,length);
         fill(234, 33, 124);
-        // ellipse(my.body.x, my.body.y, 20);
+
       }
   
   my.dir = 'none';
