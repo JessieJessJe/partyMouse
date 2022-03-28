@@ -130,7 +130,7 @@ let obst;
 const ASSETSManager = new Map();
 
 function preload() {
-  partyConnect("wss://deepstream-server-1.herokuapp.com", "arteam3", "newroom0");
+  partyConnect("wss://deepstream-server-1.herokuapp.com", "arteam3", "newroom00");
   shared = partyLoadShared("shared");
   my = partyLoadMyShared();
   participants = partyLoadParticipantShareds();
@@ -461,6 +461,21 @@ function draw() {
     if(dist(my.body.x, my.body.y, my.pizza.x, my.pizza.y) < 30){
       my.pizza.x = my.body.x;
       my.pizza.y = my.body.y + 10;
+      
+      //check to see if other participants have pizza
+      //if yes, reasign their pizza
+      participants.forEach((p)=>{
+        if (p){
+                  if (p.id !== my.id && p.pizzaPicked === true){
+          p.pizzaPicked = false;
+          p.pizza.x = random(width);
+          p.pizza.y = random(height);
+          
+        }
+        }
+
+      })
+      
       my.pizzaPicked = true;
     }
     if(dist(my.pizza.x, my.pizza.y, my.target.x, my.target.y) < 30){
@@ -509,10 +524,19 @@ function draw() {
   if (my.members.length){
 
     let member = my.members[0];
-
+    let pizzaPicked = false;
+    
+    //check if any of the group member has pizza
+    my.members.forEach((m)=>{
+      if (participants[m].pizzaPicked === true){
+        pizzaPicked = true;
+      }
+    })
+    
     let dir = participants[member].dir !== 'none' ? participants[member].dir : (participants[member].facing == 'left' ? 'left' : 'right');
     let ifRunning = participants[member].dir !== 'none' ? true : false;
-    drawMouse(participants[member].body.x, participants[member].body.y, dir, ifRunning, participants[member].pizzaPicked, my.members,length);
+    drawMouse(participants[member].body.x, participants[member].body.y, dir, ifRunning, pizzaPicked, my.members,length);
+    
       // for (let member of my.members){
       //       fill(234, 33, 124);
    
