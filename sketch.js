@@ -462,8 +462,8 @@ function draw() {
   })
   
   if (my.ready){//////////////////data validation
-    // if(dist(my.body.x, my.body.y, my.pizza.x, my.pizza.y) < 30){
-    if( my.pizzaPicked === true && dist(my.body.x, my.body.y, my.target.x, my.target.y) < 30){
+    if(dist(my.body.x, my.body.y, my.pizza.x, my.pizza.y) < 30){
+  
       my.pizza.x = my.body.x;
       my.pizza.y = my.body.y + 10;
       
@@ -483,7 +483,9 @@ function draw() {
       
       my.pizzaPicked = true;
     }
-    if(dist(my.pizza.x, my.pizza.y, my.target.x, my.target.y) < 30){
+
+    // if(dist(my.pizza.x, my.pizza.y, my.target.x, my.target.y) < 30){
+    if( my.pizzaPicked === true && dist(my.body.x, my.body.y, my.target.x, my.target.y) < 30){
       shared.score += 1;
       my.pizza.x = random(width);
       my.pizza.y = random(height);
@@ -506,9 +508,6 @@ function draw() {
   drawMask(my.body.x, my.body.y);
   ////////////////////draw pizza and hole
   push();
-  fill(255);
-  textSize(32);
-  text(shared.timer, width/2, 72);
   
   fill(32, 54, 123);
   image(ASSETSManager.get("hole_EX"), my.target.x, my.target.y);
@@ -567,6 +566,12 @@ function draw() {
       }
   
   my.dir = 'none';
+
+  push();
+  fill(255);
+  textSize(32);
+  text(shared.timer, width/2, 72);
+  pop();
 }
 
 ///////////front end 
