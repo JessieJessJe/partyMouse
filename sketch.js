@@ -23,7 +23,7 @@ const ASSETSManager = new Map();
 const imgFolder = "image/", audioFolder = "audio/";
 
 function preload() {
-  partyConnect("wss://deepstream-server-1.herokuapp.com", "arteam3", "room0");
+  partyConnect("wss://deepstream-server-1.herokuapp.com", "arteam3", "room00");
   shared = partyLoadShared("shared");
   my = partyLoadMyShared();
   participants = partyLoadParticipantShareds();
@@ -89,7 +89,7 @@ function setup() {
   
   if(partyIsHost()){
     
-    partySetShared(shared, {obsts: [], score: 0, timer: 90})
+    partySetShared(shared, {obsts: [], score: 0, timer: 90, gameOver: false})
     // shared.obsts = [];
     // shared.score = 0;
     for(let i = 0; i < 20; i++){
@@ -126,8 +126,14 @@ function draw() {
       // endscreen here use shared.score for number of pizzas collected in total
       //shared.timer = 90;
       gameOver = true;
+      shared.gameOver = true;
     }
+  }else{
+    gameOver = shared.gameOver;
   }
+ 
+
+
 
   if(keyIsDown(38) && my.body.y > 10){
     my.dY = -3;
@@ -284,16 +290,16 @@ function draw() {
   participants.forEach((p, index) => {
       // fill(234, 33, 124);
       // ellipse(p.body.x, p.body.y, 20);
-      if(p.id !== my.id){
-        //others = participants.splice(index, 1);
-        //console.log(my.id, others);
-        if (p.ready){//////////////////data validation
+      // if(p.id !== my.id){
+      //   //others = participants.splice(index, 1);
+      //   //console.log(my.id, others);
+      //   if (p.ready){//////////////////data validation
          
-          if(dist(p.body.x, p.body.y, my.body.x, my.body.y) < 20){
-          //shared.score -= 1;
-        }
-        }
-      }
+      //     if(dist(p.body.x, p.body.y, my.body.x, my.body.y) < 20){
+      //     //shared.score -= 1;
+      //   }
+      //   }
+      // }
     
       shared.obsts.forEach((obst) => {
         if (p.ready){//////////////////data validation
@@ -349,6 +355,7 @@ function draw() {
       ASSETSManager.get("pickup").play();
       
       my.pizzaPicked = true;
+      console.log(my.pizzaPicked,'picked')
     }
 
     // if(dist(my.pizza.x, my.pizza.y, my.target.x, my.target.y) < 30){
@@ -422,7 +429,7 @@ function draw() {
         let myPizzaPicked = []
         myPizzaPicked.push(my.pizzaPicked)
         
-        drawMouse(my.body.x, my.body.y, dir, ifRunning, my.pizzaPicked,  my.members, 1 , myPizzaPicked);
+        drawMouse(my.body.x, my.body.y, dir, ifRunning, my.pizzaPicked,  1 , myPizzaPicked);
     
 
       }
@@ -441,7 +448,7 @@ function draw() {
     rect(width/2, height/2, width, height);
     fill(0);
     textFont(ASSETSManager.get("timer_font"));
-    textSize(40);
+    textSize(25);
     text(`Well done! You collected ${shared.score} pizzas.`, width/2, height/2);
     pop();
   }
@@ -451,7 +458,7 @@ function draw() {
 let parentKeyCode = 0; 
 
 window.addEventListener("message", (e)=>{
-    console.log(e.data, 'receive')
+    // console.log(e.data, 'receive')
     parentKeyCode = e.data;
 }) 
 

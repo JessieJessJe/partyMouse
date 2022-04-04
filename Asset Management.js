@@ -58,8 +58,13 @@ function drawMouse(x, y, dir, ifRunning, hasPizza, miceNum , membersPizzaPicked)
   let pizzaImg_forward = ASSETSManager.get("pizza_forward_" + movingState)[imgIndex];
   let pizzaImg_back = ASSETSManager.get("pizza_back_" + movingState)[imgIndex];
   // check each group member
+
+  console.log(membersPizzaPicked,'array')
+
   for (let i=0; i < membersPizzaPicked.length; i++){
     let pizzaPicked = membersPizzaPicked[i];
+
+    console.log(pizzaPicked,'draw')
     
     if(pizzaPicked) {
       if(i % 2 === 0) {
