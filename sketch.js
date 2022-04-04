@@ -355,7 +355,7 @@ function draw() {
       ASSETSManager.get("pickup").play();
       
       my.pizzaPicked = true;
-      console.log(my.pizzaPicked,'picked')
+    
     }
 
     // if(dist(my.pizza.x, my.pizza.y, my.target.x, my.target.y) < 30){
